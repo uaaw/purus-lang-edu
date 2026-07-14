@@ -1,0 +1,250 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #f5f6fa;
+  --color-bg-secondary: #eceef4;
+  --color-bg-tertiary: #dfe1ec;
+  --color-text: #16171d;
+  --color-text-secondary: #3a3b4e;
+  --color-text-muted: #6b6d82;
+  --color-border: #c5c7d4;
+  --color-border-light: #dfe1ec;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
+  --color-accent-muted: #f59e0b33;
+  --color-error: #ef4444;
+  --color-code-bg: #eceef4;
+  --color-sidebar-bg: #f8f9fc;
+  --color-header-bg: #f5f6fa;
+}
+
+[data-theme="dark"] {
+  --color-bg: #16171d;
+  --color-bg-secondary: #1e2029;
+  --color-bg-tertiary: #2c2e3b;
+  --color-text: #ffffff;
+  --color-text-secondary: #bfc1d0;
+  --color-text-muted: #898ba0;
+  --color-border: #2c2e3b;
+  --color-border-light: #1e2029;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #fbbf24;
+  --color-accent-muted: #f59e0b22;
+  --color-error: #ef4444;
+  --color-code-bg: #1e2029;
+  --color-sidebar-bg: #1a1c25;
+  --color-header-bg: #16171d;
+}
+
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  transition: background-color 0.15s;
+}
+
+.btn-accent:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn-outline {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  transition: background-color 0.15s;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.nav-link {
+  color: var(--color-text-secondary);
+  transition: background-color 0.15s;
+}
+
+.nav-link:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.icon-btn {
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  transition: background-color 0.15s;
+}
+
+.icon-btn:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.lesson-description {
+  line-height: 1.7;
+}
+
+.lesson-description p {
+  margin: 8px 0;
+  color: var(--color-text-secondary);
+}
+
+.lesson-description p:first-child {
+  margin-top: 0;
+}
+
+.lesson-description p:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-description h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 24px 0 10px;
+  color: var(--color-text);
+}
+
+.lesson-description h1:first-child {
+  margin-top: 0;
+}
+
+.lesson-description h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 20px 0 8px;
+  color: var(--color-text);
+}
+
+.lesson-description h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 16px 0 6px;
+  color: var(--color-text);
+}
+
+.lesson-description pre {
+  background: var(--color-code-bg);
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.lesson-description pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.lesson-description code {
+  background: var(--color-code-bg);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.lesson-description ul,
+.lesson-description ol {
+  margin: 10px 0;
+  padding-left: 24px;
+}
+
+.lesson-description ul {
+  list-style: disc;
+}
+
+.lesson-description ol {
+  list-style: decimal;
+}
+
+.lesson-description li {
+  margin: 4px 0;
+}
+
+.lesson-description table {
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+  width: 100%;
+}
+
+.lesson-description th,
+.lesson-description td {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+}
+
+.lesson-description th {
+  background: var(--color-bg-secondary);
+  font-weight: 600;
+}
+
+.lesson-description a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.lesson-description strong {
+  font-weight: 600;
+}
