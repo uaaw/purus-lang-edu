@@ -1,3 +1,15 @@
+export interface TestCase {
+  id: string;
+  type: "output" | "variable" | "function";
+  label: string;
+  labelJa: string;
+  expectedOutput?: string;
+  variableName?: string;
+  expectedValue?: unknown;
+  callExpression?: string;
+  expectedReturnValue?: unknown;
+}
+
 export interface Lesson {
   id: string;
   number: number;
@@ -8,6 +20,7 @@ export interface Lesson {
   starterCode: string;
   starterCodeEn: string;
   solution: string;
+  tests: TestCase[];
 }
 
 export const lessons: Lesson[] = [
@@ -21,6 +34,15 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 01: Hello, World\n--\n-- Purus の文字列は //;text;// と書きます。\n-- 関数呼び出しは () ではなく [] を使います。\n--\n-- TODO: //;???;// を書き換えて Hello, Purus! と出力しましょう。\n\nconsole.log[//;???;//]",
     starterCodeEn: "-- Lesson 01: Hello, World\n--\n-- Strings are written as //;text;//.\n-- Function calls use [] instead of ().\n--\n-- TODO: Change //;???;// so it prints: Hello, Purus!\n\nconsole.log[//;???;//]",
     solution: "console.log[//;Hello, Purus!;//]",
+    tests: [
+      {
+        id: "01-1",
+        type: "output",
+        label: "Prints Hello, Purus!",
+        labelJa: "Hello, Purus! が出力される",
+        expectedOutput: "Hello, Purus!",
+      },
+    ],
   },
   {
     id: "02-variables",
@@ -32,6 +54,24 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 02: 変数\n--\n-- 変数は const / let で宣言し、= の代わりに be を使います。\n-- 再代入には複合代入 `add be` (+=) などを使います。\n\n-- TODO 1: 定数 language の値を //;Purus;// にしましょう。\nconst language be //;???;//\n\n-- TODO 2: count に複合代入を使って 10 を足しましょう。\n--         ヒント: count add be 10\nlet count be 0",
     starterCodeEn: "-- Lesson 02: Variables\n--\n-- Variables are declared with const / let, using `be` instead of `=`.\n-- Use compound assignment like `add be` (+=) to update them.\n\n-- TODO 1: Make the constant `language` hold the string Purus.\nconst language be //;???;//\n\n-- TODO 2: Add 10 to `count` using compound assignment.\n--         Hint: count add be 10\nlet count be 0",
     solution: "const language be //;Purus;//\n\nlet count be 0\ncount add be 10",
+    tests: [
+      {
+        id: "02-1",
+        type: "variable",
+        label: "language is \"Purus\"",
+        labelJa: "language が \"Purus\" である",
+        variableName: "language",
+        expectedValue: "Purus",
+      },
+      {
+        id: "02-2",
+        type: "variable",
+        label: "count is 10",
+        labelJa: "count が 10 である",
+        variableName: "count",
+        expectedValue: 10,
+      },
+    ],
   },
   {
     id: "03-strings",
@@ -43,6 +83,23 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 03: 文字列\n--\n-- 文字列の中で [式] と書くと、式の値を埋め込めます（補間）。\n--\n--   const name be //;Alice;//\n--   const msg be //;Hi, [name]!;//   → \"Hi, Alice!\"\n\nconst name be //;World;//\n\n-- TODO: 補間を使って greeting を //;Hello, World!;// にしましょう。\n--       ヒント: [name] を文字列の中に書きます\nconst greeting be //;???;//\n\nconsole.log[greeting]",
     starterCodeEn: "-- Lesson 03: Strings\n--\n-- Write [expr] inside a string to embed a value (interpolation).\n--\n--   const name be //;Alice;//\n--   const msg be //;Hi, [name]!;//   → \"Hi, Alice!\"\n\nconst name be //;World;//\n\n-- TODO: Use interpolation so greeting becomes Hello, World!\n--       Hint: put [name] inside the string\nconst greeting be //;???;//\n\nconsole.log[greeting]",
     solution: "const name be //;World;//\n\nconst greeting be //;Hello, [name]!;//\n\nconsole.log[greeting]",
+    tests: [
+      {
+        id: "03-1",
+        type: "variable",
+        label: "greeting is \"Hello, World!\"",
+        labelJa: "greeting が \"Hello, World!\" である",
+        variableName: "greeting",
+        expectedValue: "Hello, World!",
+      },
+      {
+        id: "03-2",
+        type: "output",
+        label: "Prints Hello, World!",
+        labelJa: "Hello, World! が出力される",
+        expectedOutput: "Hello, World!",
+      },
+    ],
   },
   {
     id: "04-operators",
@@ -54,6 +111,48 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 04: 演算子\n--\n-- Purus は記号ではなくキーワードの演算子を使います:\n--\n--   add (+)   sub (-)   mul (*)   div (/)   mod (%)   pow (**)\n--\n--   例:  7 add 3  → 10\n\nconst a be 7\nconst b be 3\n\n-- TODO: 0 を正しい式に書き換えましょう。\nconst sum be 0        -- a と b の和\nconst difference be 0 -- a と b の差\nconst product be 0    -- a と b の積\nconst remainder be 0  -- a を b で割った余り\nconst power be 0      -- a の b 乗",
     starterCodeEn: "-- Lesson 04: Operators\n--\n-- Purus uses keyword operators instead of symbols:\n--\n--   add (+)   sub (-)   mul (*)   div (/)   mod (%)   pow (**)\n--\n--   e.g.  7 add 3  → 10\n\nconst a be 7\nconst b be 3\n\n-- TODO: Replace each 0 with the correct expression.\nconst sum be 0        -- a plus b\nconst difference be 0 -- a minus b\nconst product be 0    -- a times b\nconst remainder be 0  -- remainder of a divided by b\nconst power be 0      -- a to the power of b",
     solution: "const a be 7\nconst b be 3\n\nconst sum be a add b\nconst difference be a sub b\nconst product be a mul b\nconst remainder be a mod b\nconst power be a pow b",
+    tests: [
+      {
+        id: "04-1",
+        type: "variable",
+        label: "sum is 10",
+        labelJa: "sum が 10 である",
+        variableName: "sum",
+        expectedValue: 10,
+      },
+      {
+        id: "04-2",
+        type: "variable",
+        label: "difference is 4",
+        labelJa: "difference が 4 である",
+        variableName: "difference",
+        expectedValue: 4,
+      },
+      {
+        id: "04-3",
+        type: "variable",
+        label: "product is 21",
+        labelJa: "product が 21 である",
+        variableName: "product",
+        expectedValue: 21,
+      },
+      {
+        id: "04-4",
+        type: "variable",
+        label: "remainder is 1",
+        labelJa: "remainder が 1 である",
+        variableName: "remainder",
+        expectedValue: 1,
+      },
+      {
+        id: "04-5",
+        type: "variable",
+        label: "power is 343",
+        labelJa: "power が 343 である",
+        variableName: "power",
+        expectedValue: 343,
+      },
+    ],
   },
   {
     id: "05-functions",
@@ -65,6 +164,24 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 05: 関数\n--\n-- 1行関数:      fn 名前 引数 to return 式\n-- ブロック関数: fn 名前 引数1; 引数2 のあとにインデントで本体を書く\n-- 呼び出し:     名前[引数1; 引数2]\n\n-- TODO 1: double が x の 2 倍を返すようにしましょう。\nfn double x to return x\n\n-- TODO 2: add-nums が a と b の和を返すようにしましょう。\nfn add-nums a; b\n  return 0",
     starterCodeEn: "-- Lesson 05: Functions\n--\n-- One-liner:   fn name arg to return expr\n-- Block body:  fn name a; b + indented body\n-- Call:        name[arg1; arg2]\n\n-- TODO 1: Make double return x times 2.\nfn double x to return x\n\n-- TODO 2: Make add-nums return the sum of a and b.\nfn add-nums a; b\n  return 0",
     solution: "fn double x to return x mul 2\n\nfn add-nums a; b\n  return a add b",
+    tests: [
+      {
+        id: "05-1",
+        type: "function",
+        label: "double(21) returns 42",
+        labelJa: "double(21) が 42 を返す",
+        callExpression: "double(21)",
+        expectedReturnValue: 42,
+      },
+      {
+        id: "05-2",
+        type: "function",
+        label: "add_nums(3, 4) returns 7",
+        labelJa: "add_nums(3, 4) が 7 を返す",
+        callExpression: "add_nums(3, 4)",
+        expectedReturnValue: 7,
+      },
+    ],
   },
   {
     id: "06-conditionals",
@@ -76,6 +193,32 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 06: 条件分岐\n--\n-- if / elif / else とインデントでブロックを作ります（{} は不要）。\n--\n-- 比較演算子:\n--   eq (===)   neq (!==)   lt (<)   gt (>)   le (<=)   ge (>=)\n\n-- TODO: sign x が次を返すようにしましょう:\n--   x gt 0  → //;positive;//\n--   x eq 0  → //;zero;//\n--   その他  → //;negative;//\nfn sign x\n  return //;???;//",
     starterCodeEn: "-- Lesson 06: Conditionals\n--\n-- Blocks are made with if / elif / else and indentation (no braces).\n--\n-- Comparison operators:\n--   eq (===)   neq (!==)   lt (<)   gt (>)   le (<=)   ge (>=)\n\n-- TODO: Make sign x return:\n--   x gt 0  → //;positive;//\n--   x eq 0  → //;zero;//\n--   otherwise → //;negative;//\nfn sign x\n  return //;???;//",
     solution: "fn sign x\n  if x gt 0\n    return //;positive;//\n  elif x eq 0\n    return //;zero;//\n  else\n    return //;negative;//",
+    tests: [
+      {
+        id: "06-1",
+        type: "function",
+        label: "sign(5) returns \"positive\"",
+        labelJa: "sign(5) が \"positive\" を返す",
+        callExpression: "sign(5)",
+        expectedReturnValue: "positive",
+      },
+      {
+        id: "06-2",
+        type: "function",
+        label: "sign(0) returns \"zero\"",
+        labelJa: "sign(0) が \"zero\" を返す",
+        callExpression: "sign(0)",
+        expectedReturnValue: "zero",
+      },
+      {
+        id: "06-3",
+        type: "function",
+        label: "sign(-3) returns \"negative\"",
+        labelJa: "sign(-3) が \"negative\" を返す",
+        callExpression: "sign(-3)",
+        expectedReturnValue: "negative",
+      },
+    ],
   },
   {
     id: "07-loops",
@@ -87,6 +230,31 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 07: ループ\n--\n-- while 条件            … 条件が true の間くり返す\n-- for item in list      … リストの要素を順にたどる\n-- total add be i        … total += i（複合代入で更新）\n\n-- TODO 1: sum-up n が 1 から n までの合計を返すようにしましょう。\n--         ヒント: let i be 1 して、while i le n の中で\n--         total add be i と i add be 1\nfn sum-up n\n  let total be 0\n  return total\n\nconst fruits be [//;apple;//, //;banana;//, //;cherry;//]\n\n-- TODO 2: for-in で fruits を 1 行ずつ出力しましょう。\n--         ヒント: for fruit in fruits",
     starterCodeEn: "-- Lesson 07: Loops\n--\n-- while cond            … repeat while cond is true\n-- for item in list      … iterate over a list\n-- total add be i        … total += i (update with compound assignment)\n\n-- TODO 1: Make sum-up return the sum of 1 through n.\n--         Hint: let i be 1, then inside while i le n do\n--         total add be i and i add be 1\nfn sum-up n\n  let total be 0\n  return total\n\nconst fruits be [//;apple;//, //;banana;//, //;cherry;//]\n\n-- TODO 2: Print each fruit on its own line with for-in.\n--         Hint: for fruit in fruits",
     solution: "fn sum-up n\n  let total be 0\n  let i be 1\n  while i le n\n    total add be i\n    i add be 1\n  return total\n\nconst fruits be [//;apple;//, //;banana;//, //;cherry;//]\n\nfor fruit in fruits\n  console.log[fruit]",
+    tests: [
+      {
+        id: "07-1",
+        type: "function",
+        label: "sum_up(5) returns 15",
+        labelJa: "sum_up(5) が 15 を返す",
+        callExpression: "sum_up(5)",
+        expectedReturnValue: 15,
+      },
+      {
+        id: "07-2",
+        type: "function",
+        label: "sum_up(10) returns 55",
+        labelJa: "sum_up(10) が 55 を返す",
+        callExpression: "sum_up(10)",
+        expectedReturnValue: 55,
+      },
+      {
+        id: "07-3",
+        type: "output",
+        label: "Prints apple, banana, cherry",
+        labelJa: "apple, banana, cherry が出力される",
+        expectedOutput: "apple\nbanana\ncherry",
+      },
+    ],
   },
   {
     id: "08-arrays",
@@ -98,6 +266,40 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 08: 配列\n--\n-- 配列リテラル: [1, 2, 3]\n-- 要素アクセスは \\ を付ける: arr[\\0]  → arr[0]  (\\ が無いと関数呼び出し扱い)\n-- 範囲リテラル: [0..4] → [0, 1, 2, 3, 4]\n-- 分割代入:     const [x; y] be arr\n\nconst numbers be [10, 20, 30]\n\n-- TODO 1: numbers の最初の要素を取り出しましょう。\nconst first be 0\n\n-- TODO 2: 範囲リテラルで [0, 1, 2, 3, 4] を作りましょう。\nconst digits be []\n\nconst colors be [//;red;//, //;blue;//]\n\n-- TODO 3: 下の 2 行を消して、分割代入 1 行で書き換えましょう。\n--         ヒント: const [first-color; second-color] be colors\nconst first-color be //;???;//\nconst second-color be //;???;//",
     starterCodeEn: "-- Lesson 08: Arrays\n--\n-- Array literal: [1, 2, 3]\n-- Index access needs \\ : arr[\\0] → arr[0] (without \\ it's a function call)\n-- Range literal: [0..4] → [0, 1, 2, 3, 4]\n-- Destructuring: const [x; y] be arr\n\nconst numbers be [10, 20, 30]\n\n-- TODO 1: Get the first element of numbers.\nconst first be 0\n\n-- TODO 2: Build [0, 1, 2, 3, 4] with a range literal.\nconst digits be []\n\nconst colors be [//;red;//, //;blue;//]\n\n-- TODO 3: Delete the two lines below and use one destructuring line instead.\n--         Hint: const [first-color; second-color] be colors\nconst first-color be //;???;//\nconst second-color be //;???;//",
     solution: "const numbers be [10, 20, 30]\n\nconst first be numbers[\\0]\n\nconst digits be [0..4]\n\nconst colors be [//;red;//, //;blue;//]\n\nconst [first-color; second-color] be colors",
+    tests: [
+      {
+        id: "08-1",
+        type: "variable",
+        label: "first is 10",
+        labelJa: "first が 10 である",
+        variableName: "first",
+        expectedValue: 10,
+      },
+      {
+        id: "08-2",
+        type: "variable",
+        label: "digits is [0, 1, 2, 3, 4]",
+        labelJa: "digits が [0, 1, 2, 3, 4] である",
+        variableName: "digits",
+        expectedValue: [0, 1, 2, 3, 4],
+      },
+      {
+        id: "08-3",
+        type: "variable",
+        label: "first_color is \"red\"",
+        labelJa: "first_color が \"red\" である",
+        variableName: "first_color",
+        expectedValue: "red",
+      },
+      {
+        id: "08-4",
+        type: "variable",
+        label: "second_color is \"blue\"",
+        labelJa: "second_color が \"blue\" である",
+        variableName: "second_color",
+        expectedValue: "blue",
+      },
+    ],
   },
   {
     id: "09-objects",
@@ -109,6 +311,15 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 09: オブジェクト\n--\n-- オブジェクトリテラル: [key be value, key2 be value2]\n-- プロパティアクセス:   obj.key\n-- 分割代入:             const object[key1; key2] be obj\n-- 空オブジェクト:       [be]\n\n-- TODO: cat を name be //;Tama;//, age be 3 のオブジェクトにしましょう。\nconst cat be [be]\n\n-- 分割代入（この行はこのままで動きます）\nconst object[name; age] be cat\n\nconsole.log[//;[name] is [age] years old;//]",
     starterCodeEn: "-- Lesson 09: Objects\n--\n-- Object literal:  [key be value, key2 be value2]\n-- Property access: obj.key\n-- Destructuring:   const object[key1; key2] be obj\n-- Empty object:    [be]\n\n-- TODO: Make cat an object with name //;Tama;// and age 3.\nconst cat be [be]\n\n-- Destructuring (this line already works)\nconst object[name; age] be cat\n\nconsole.log[//;[name] is [age] years old;//]",
     solution: "const cat be [name be //;Tama;//, age be 3]\n\nconst object[name; age] be cat\n\nconsole.log[//;[name] is [age] years old;//]",
+    tests: [
+      {
+        id: "09-1",
+        type: "output",
+        label: "Prints \"Tama is 3 years old\"",
+        labelJa: "\"Tama is 3 years old\" が出力される",
+        expectedOutput: "Tama is 3 years old",
+      },
+    ],
   },
   {
     id: "10-switch",
@@ -120,6 +331,35 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 10: スイッチ\n--\n-- switch 値\n--   case 値 then 文        … 値が一致したら実行\n--   case blank then 文     … どれにも一致しないとき（ワイルドカード）\n\n-- TODO: greet-in に次の 2 つの case を追加しましょう:\n--   case //;ja;//  → console.log[//;Konnichiwa;//]\n--   case blank     → console.log[//;Unknown language;//]\nfn greet-in lang\n  switch lang\n    case //;en;// then console.log[//;Hello;//]",
     starterCodeEn: "-- Lesson 10: Switch\n--\n-- switch value\n--   case v then stmt       … runs when value matches v\n--   case blank then stmt   … fallback when nothing matches (wildcard)\n\n-- TODO: Add these two cases to greet-in:\n--   case //;ja;//  → console.log[//;Konnichiwa;//]\n--   case blank     → console.log[//;Unknown language;//]\nfn greet-in lang\n  switch lang\n    case //;en;// then console.log[//;Hello;//]",
     solution: "fn greet-in lang\n  switch lang\n    case //;en;// then console.log[//;Hello;//]\n    case //;ja;// then console.log[//;Konnichiwa;//]\n    case blank then console.log[//;Unknown language;//]",
+    tests: [
+      {
+        id: "10-1",
+        type: "function",
+        label: "greet_in(\"en\") executes without error",
+        labelJa: "greet_in(\"en\") がエラーなく実行される",
+        callExpression: "greet_in(\"en\")",
+        expectedReturnValue: undefined,
+        expectedOutput: "Hello",
+      },
+      {
+        id: "10-2",
+        type: "function",
+        label: "greet_in(\"ja\") executes without error",
+        labelJa: "greet_in(\"ja\") がエラーなく実行される",
+        callExpression: "greet_in(\"ja\")",
+        expectedReturnValue: undefined,
+        expectedOutput: "Konnichiwa",
+      },
+      {
+        id: "10-3",
+        type: "function",
+        label: "greet_in(\"fr\") executes without error",
+        labelJa: "greet_in(\"fr\") がエラーなく実行される",
+        callExpression: "greet_in(\"fr\")",
+        expectedReturnValue: undefined,
+        expectedOutput: "Unknown language",
+      },
+    ],
   },
   {
     id: "11-pipeline",
@@ -131,6 +371,24 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 11: パイプラインと Null 合体\n--\n-- pipe は値を関数に渡します:  5 pipe double  → double(5)\n-- 左から右へ読めます:         5 pipe double pipe increment\n-- coal は左辺が null / undefined のとき右辺を返します:\n--   config.port coal 3000  → config.port ?? 3000\n\nfn double x to return x mul 2\nfn increment x to return x add 1\n\n-- TODO 1: 5 を double → increment の順に pipe で流しましょう（11 になります）。\nconst result be 0\n\nconst config-port be null\n\n-- TODO 2: coal を使って、config-port が null のとき port が 3000 になるようにしましょう。\nconst port be 0",
     starterCodeEn: "-- Lesson 11: Pipeline & Nullish Coalescing\n--\n-- pipe passes a value to a function:  5 pipe double  → double(5)\n-- Chains read left to right:          5 pipe double pipe increment\n-- coal returns the right side when the left is null / undefined:\n--   config.port coal 3000  → config.port ?? 3000\n\nfn double x to return x mul 2\nfn increment x to return x add 1\n\n-- TODO 1: Pipe 5 through double, then increment (should become 11).\nconst result be 0\n\nconst config-port be null\n\n-- TODO 2: Use coal so port falls back to 3000 when config-port is null.\nconst port be 0",
     solution: "fn double x to return x mul 2\nfn increment x to return x add 1\n\nconst result be 5 pipe double pipe increment\n\nconst config-port be null\n\nconst port be config-port coal 3000",
+    tests: [
+      {
+        id: "11-1",
+        type: "variable",
+        label: "result is 11",
+        labelJa: "result が 11 である",
+        variableName: "result",
+        expectedValue: 11,
+      },
+      {
+        id: "11-2",
+        type: "variable",
+        label: "port is 3000",
+        labelJa: "port が 3000 である",
+        variableName: "port",
+        expectedValue: 3000,
+      },
+    ],
   },
   {
     id: "12-classes",
@@ -142,6 +400,32 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 12: クラス\n--\n-- class 名前 + インデントで本体を書きます。`fn new` がコンストラクタです。\n-- メソッドはクラスの中に普通の fn として書きます。\n-- インスタンス生成は: new 名前[引数]\n\nclass Counter\n  fn new start\n    this.value be start\n\n  -- TODO 1: this.value に 1 を足す `increment` メソッドを追加しましょう。\n  --         ヒント: this.value add be 1\n\n  -- TODO 2: //;Count: [this.value];// を返す `describe` メソッドを追加しましょう。\n\nconst counter be new Counter[10]",
     starterCodeEn: "-- Lesson 12: Classes\n--\n-- class Name + indented body. `fn new` is the constructor.\n-- Methods are plain fn declarations inside the class.\n-- Create instances with: new Name[args]\n\nclass Counter\n  fn new start\n    this.value be start\n\n  -- TODO 1: Add an `increment` method that adds 1 to this.value.\n  --         Hint: this.value add be 1\n\n  -- TODO 2: Add a `describe` method that returns //;Count: [this.value];//\n\nconst counter be new Counter[10]",
     solution: "class Counter\n  fn new start\n    this.value be start\n\n  fn increment\n    this.value add be 1\n\n  fn describe\n    return //;Count: [this.value];//\n\nconst counter be new Counter[10]",
+    tests: [
+      {
+        id: "12-1",
+        type: "variable",
+        label: "counter.value is 10",
+        labelJa: "counter.value が 10 である",
+        variableName: "counter.value",
+        expectedValue: 10,
+      },
+      {
+        id: "12-2",
+        type: "function",
+        label: "counter.describe() returns \"Count: 10\"",
+        labelJa: "counter.describe() が \"Count: 10\" を返す",
+        callExpression: "counter.describe()",
+        expectedReturnValue: "Count: 10",
+      },
+      {
+        id: "12-3",
+        type: "function",
+        label: "counter.increment() increases the value",
+        labelJa: "counter.increment() が値を増やす",
+        callExpression: "(() => { counter.increment(); return counter.value; })()",
+        expectedReturnValue: 11,
+      },
+    ],
   },
   {
     id: "13-error-handling",
@@ -153,6 +437,32 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 13: エラー処理\n--\n-- throw new Error[//;message;//]   … エラーを投げる\n-- try / catch e / finally         … エラーを処理する（インデントブロック）\n\n-- TODO 1: b eq 0 のとき throw new Error[//;division by zero;//] しましょう。\nfn safe-divide a; b\n  return a div b\n\n-- TODO 2: 呼び出しを try/catch で包み、エラー時は catch ブロックで\n--         //;error: [e.message];// を返しましょう。\nfn try-divide a; b\n  return safe-divide[a; b]",
     starterCodeEn: "-- Lesson 13: Error Handling\n--\n-- throw new Error[//;message;//]   … raise an error\n-- try / catch e / finally         … handle errors (indented blocks)\n\n-- TODO 1: When b eq 0, throw new Error[//;division by zero;//]\nfn safe-divide a; b\n  return a div b\n\n-- TODO 2: Wrap the call in try/catch. On error,\n--         return //;error: [e.message];// from the catch block.\nfn try-divide a; b\n  return safe-divide[a; b]",
     solution: "fn safe-divide a; b\n  if b eq 0\n    throw new Error[//;division by zero;//]\n  return a div b\n\nfn try-divide a; b\n  try\n    return safe-divide[a; b]\n  catch e\n    return //;error: [e.message];//",
+    tests: [
+      {
+        id: "13-1",
+        type: "function",
+        label: "safe_divide(10, 2) returns 5",
+        labelJa: "safe_divide(10, 2) が 5 を返す",
+        callExpression: "safe_divide(10, 2)",
+        expectedReturnValue: 5,
+      },
+      {
+        id: "13-2",
+        type: "function",
+        label: "try_divide(10, 0) returns error message",
+        labelJa: "try_divide(10, 0) がエラーメッセージを返す",
+        callExpression: "try_divide(10, 0)",
+        expectedReturnValue: "error: division by zero",
+      },
+      {
+        id: "13-3",
+        type: "function",
+        label: "try_divide(10, 2) returns 5",
+        labelJa: "try_divide(10, 2) が 5 を返す",
+        callExpression: "try_divide(10, 2)",
+        expectedReturnValue: 5,
+      },
+    ],
   },
   {
     id: "14-async",
@@ -164,6 +474,24 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 14: 非同期処理 (async / await)\n--\n-- async fn は非同期関数を宣言します（Promise を返します）。\n-- await は async 関数の中で Promise の完了を待ちます。\n\nasync fn slow-double x\n  return x mul 2\n\n-- TODO: compute が slow-double[x] を await し、結果に 1 を足すようにしましょう。\n--       compute[5] の結果は 11 になります。\nasync fn compute x\n  return 0",
     starterCodeEn: "-- Lesson 14: Async / Await\n--\n-- async fn declares an async function (it returns a Promise).\n-- await waits for a Promise inside an async function.\n\nasync fn slow-double x\n  return x mul 2\n\n-- TODO: Make compute await slow-double[x], then add 1 to the result.\n--       compute[5] should resolve to 11.\nasync fn compute x\n  return 0",
     solution: "async fn slow-double x\n  return x mul 2\n\nasync fn compute x\n  const doubled be await slow-double[x]\n  return doubled add 1",
+    tests: [
+      {
+        id: "14-1",
+        type: "function",
+        label: "slow_double(5) resolves to 10",
+        labelJa: "slow_double(5) が 10 に解決される",
+        callExpression: "slow_double(5)",
+        expectedReturnValue: 10,
+      },
+      {
+        id: "14-2",
+        type: "function",
+        label: "compute(5) resolves to 11",
+        labelJa: "compute(5) が 11 に解決される",
+        callExpression: "compute(5)",
+        expectedReturnValue: 11,
+      },
+    ],
   },
   {
     id: "15-stdlib",
@@ -175,6 +503,32 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 15: 標準ライブラリ\n--\n-- `use` は Purus 組み込みの標準ライブラリを読み込みます。\n-- モジュール名には p- の接頭辞が付きます: p-math, p-array, p-string, ...\n-- `as` で短い名前を付けられます。\n\nuse p-math as m\nuse p-array as arr\n\n-- TODO 1: m.round で 3.7 を四捨五入しましょう。\nconst rounded be 0\n\n-- TODO 2: m.max で 3, 1, 4 の最大値を求めましょう（引数は ; で区切る）。\nconst biggest be 0\n\n-- TODO 3: arr.sum で配列 [1, 2, 3] の合計を求めましょう。\nconst total be 0",
     starterCodeEn: "-- Lesson 15: Standard Library\n--\n-- `use` imports Purus's built-in standard library modules.\n-- Module names are prefixed with p- : p-math, p-array, p-string, ...\n-- `as` gives the module a short name.\n\nuse p-math as m\nuse p-array as arr\n\n-- TODO 1: Round 3.7 to the nearest integer with m.round.\nconst rounded be 0\n\n-- TODO 2: Get the largest of 3, 1, 4 with m.max (separate args with ;).\nconst biggest be 0\n\n-- TODO 3: Sum the array [1, 2, 3] with arr.sum.\nconst total be 0",
     solution: "use p-math as m\nuse p-array as arr\n\nconst rounded be m.round[3.7]\n\nconst biggest be m.max[3; 1; 4]\n\nconst total be arr.sum[[1, 2, 3]]",
+    tests: [
+      {
+        id: "15-1",
+        type: "variable",
+        label: "rounded is 4",
+        labelJa: "rounded が 4 である",
+        variableName: "rounded",
+        expectedValue: 4,
+      },
+      {
+        id: "15-2",
+        type: "variable",
+        label: "biggest is 4",
+        labelJa: "biggest が 4 である",
+        variableName: "biggest",
+        expectedValue: 4,
+      },
+      {
+        id: "15-3",
+        type: "variable",
+        label: "total is 6",
+        labelJa: "total が 6 である",
+        variableName: "total",
+        expectedValue: 6,
+      },
+    ],
   },
   {
     id: "16-generators",
@@ -186,17 +540,83 @@ export const lessons: Lesson[] = [
     starterCode: "-- Lesson 16: ジェネレータ\n--\n-- `yield` を含む関数は自動的にジェネレータ（JS の function*）になります。\n-- yield するたびに値を 1 つ渡し、呼び出し側は for-in で順に受け取れます。\n\n-- TODO: count-up が 1, 2, ..., limit を順に yield するようにしましょう。\n--       ヒント: let i be 1 して、while i le limit の中で yield i と i add be 1\nfn count-up limit\n  yield 0\n\nfor v in count-up[3]\n  console.log[v]",
     starterCodeEn: "-- Lesson 16: Generators\n--\n-- A function containing `yield` automatically becomes a generator\n-- (JS function*). Each yield hands out one value; the caller can\n-- iterate over them with for-in.\n\n-- TODO: Make count-up yield 1, 2, ..., limit in order.\n--       Hint: let i be 1, then while i le limit: yield i and i add be 1\nfn count-up limit\n  yield 0\n\nfor v in count-up[3]\n  console.log[v]",
     solution: "fn count-up limit\n  let i be 1\n  while i le limit\n    yield i\n    i add be 1\n\nfor v in count-up[3]\n  console.log[v]",
+    tests: [
+      {
+        id: "16-1",
+        type: "output",
+        label: "Prints exactly 1, 2, 3",
+        labelJa: "1, 2, 3 だけが順に出力される",
+        expectedOutput: "1\n2\n3",
+      },
+      {
+        id: "16-2",
+        type: "function",
+        label: "count_up(5) yields 1 through 5",
+        labelJa: "count_up(5) が 1 から 5 を生成する",
+        callExpression: "Array.from(count_up(5))",
+        expectedReturnValue: [1, 2, 3, 4, 5],
+      },
+      {
+        id: "16-3",
+        type: "function",
+        label: "count_up(0) yields nothing",
+        labelJa: "count_up(0) が何も生成しない",
+        callExpression: "Array.from(count_up(0))",
+        expectedReturnValue: [],
+      },
+    ],
   },
   {
     id: "17-fizzbuzz",
     number: 17,
     title: "FizzBuzz",
     titleJa: "FizzBuzz",
-    description: "# Lesson 17 — FizzBuzz（卒業課題）\n\n[English](./README.md)\n\n最後の課題です！これまで学んだすべて — 関数、`if`/`elif`/`else`、`mod`、文字列補間、ループ — を使って定番の FizzBuzz を書きましょう。\n\n## ルール\n\n| 入力 | 出力 |\n|---|---|\n| 15 の倍数 | `FizzBuzz` |\n| 3 の倍数 | `Fizz` |\n| 5 の倍数 | `Buzz` |\n| それ以外 | 数値そのまま。例: `7` |\n\n## 課題\n\n1. ルールどおりに `fizzbuzz n` を実装する。15 の倍数の判定は 3 や 5 より**先に**！\n2. `n` を 1 から 15 までループして（ヒント: `for n in [1..15]`）、それぞれ `fizzbuzz[n]` を出力する。\n\n期待される出力:\n\n```\n1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n```\n\n## 確認\n\n```sh\nnpm test 17\n```\n\n## おめでとうございます！\n\nこれが最後のレッスンでした。`npm run progress` で全記録を確認したら、次に進みましょう:\n\n- [Purus ドキュメント](https://purus.work)\n- [Playground](https://playground.purus.work) — ブラウザで Purus を試す\n- 実際に何か作ってみる: `npx purus init my-project`",
-    descriptionEn: "# Lesson 17 — FizzBuzz (Capstone)\n\n[日本語](./README-ja.md)\n\nThe final challenge! Write the classic FizzBuzz using everything you've learned — functions, `if`/`elif`/`else`, `mod`, string interpolation, and loops.\n\n## Rules\n\n| Input | Output |\n|---|---|\n| multiple of 15 | `FizzBuzz` |\n| multiple of 3 | `Fizz` |\n| multiple of 5 | `Buzz` |\n| anything else | the number itself, e.g. `7` |\n\n## Task\n\n1. Implement `fizzbuzz n` following the rules. Careful — check the multiple of 15 **before** 3 and 5!\n2. Loop `n` from 1 to 15 (hint: `for n in [1..15]`) and print `fizzbuzz[n]` for each.\n\nExpected output:\n\n```\n1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n```\n\n## Check\n\n```sh\nnpm test 17\n```\n\n## Congratulations!\n\nThis was the last lesson. Run `npm run progress` to see your full record, then keep exploring:\n\n- [Purus Documentation](https://purus.work)\n- [Playground](https://playground.purus.work) — try Purus in the browser\n- Build something real: `npx purus init my-project`",
+    description: "# Lesson 17 — FizzBuzz（卒業課題）\n\n[English](./README.md)\n\n最後の課題です！これまで学んだすべて — 関数、`if`/`elif`/`else`、`mod`、文字列補間、ループ — を使って定番の FizzBuzz を書きましょう。\n\n## ルール\n\n| 入力 | 出力 |\n|---|---|\n| 15 の倍数 | `FizzBuzz` |\n| 3 の倍数 | `Fizz` |\n| 5 の倍数 | `Buzz` |\n| それ以外 | 数値そのまま。例: `7` |\n\n## 課題\n\n1. ルールどおりに `fizzbuzz n` を実装する。15 の倍数の判定は 3 や 5 より**先に**！\n2. `n` を 1 から 15 までループして（ヒント: `for n in [1..15]`）、それぞれ `fizzbuzz[n]` を出力する。\n\n期待される出力:\n\n```\n1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n```\n\n## 確認\n\n```sh\nnpm test 17\n```\n\n## おめでとうございます！\n\nこれが最後のレッスンでした。実行して全テストに合格したら、次に進みましょう:\n\n- [Purus ドキュメント](https://purus.work)\n- [Playground](https://playground.purus.work) — ブラウザで Purus を試す\n- 実際に何か作ってみる: `npx purus init my-project`",
+    descriptionEn: "# Lesson 17 — FizzBuzz (Capstone)\n\n[日本語](./README-ja.md)\n\nThe final challenge! Write the classic FizzBuzz using everything you've learned — functions, `if`/`elif`/`else`, `mod`, string interpolation, and loops.\n\n## Rules\n\n| Input | Output |\n|---|---|\n| multiple of 15 | `FizzBuzz` |\n| multiple of 3 | `Fizz` |\n| multiple of 5 | `Buzz` |\n| anything else | the number itself, e.g. `7` |\n\n## Task\n\n1. Implement `fizzbuzz n` following the rules. Careful — check the multiple of 15 **before** 3 and 5!\n2. Loop `n` from 1 to 15 (hint: `for n in [1..15]`) and print `fizzbuzz[n]` for each.\n\nExpected output:\n\n```\n1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n```\n\n## Check\n\n```sh\nnpm test 17\n```\n\n## Congratulations!\n\nThis was the last lesson. Once your code passes all tests, keep exploring:\n\n- [Purus Documentation](https://purus.work)\n- [Playground](https://playground.purus.work) — try Purus in the browser\n- Build something real: `npx purus init my-project`",
     starterCode: "-- Lesson 17: FizzBuzz — 卒業課題\n--\n-- 最後の課題です！これまで学んだすべてを組み合わせましょう:\n-- 関数、条件分岐、mod、文字列補間、ループ。\n--\n-- ルール:\n--   15 の倍数 → //;FizzBuzz;//\n--   3 の倍数  → //;Fizz;//\n--   5 の倍数  → //;Buzz;//\n--   それ以外  → 数値を文字列で。例: //;[n];//\n\n-- TODO 1: 上のルールどおりに fizzbuzz を実装しましょう。\nfn fizzbuzz n\n  return //;???;//\n\n-- TODO 2: n を 1 から 15 までループして fizzbuzz[n] を出力しましょう。\n--         ヒント: for n in [1..15]",
     starterCodeEn: "-- Lesson 17: FizzBuzz — Capstone\n--\n-- The final challenge! Combine everything you've learned:\n-- functions, conditionals, mod, string interpolation, and loops.\n--\n-- Rules:\n--   multiple of 15 → //;FizzBuzz;//\n--   multiple of 3  → //;Fizz;//\n--   multiple of 5  → //;Buzz;//\n--   otherwise      → the number as a string, e.g. //;[n];//\n\n-- TODO 1: Implement fizzbuzz following the rules above.\nfn fizzbuzz n\n  return //;???;//\n\n-- TODO 2: Loop n from 1 to 15 and print fizzbuzz[n] for each.\n--         Hint: for n in [1..15]",
     solution: "fn fizzbuzz n\n  if n mod 15 eq 0\n    return //;FizzBuzz;//\n  elif n mod 3 eq 0\n    return //;Fizz;//\n  elif n mod 5 eq 0\n    return //;Buzz;//\n  else\n    return //;[n];//\n\nfor n in [1..15]\n  console.log[fizzbuzz[n]]",
+    tests: [
+      {
+        id: "17-1",
+        type: "function",
+        label: "fizzbuzz(1) returns \"1\"",
+        labelJa: "fizzbuzz(1) が \"1\" を返す",
+        callExpression: "fizzbuzz(1)",
+        expectedReturnValue: "1",
+      },
+      {
+        id: "17-2",
+        type: "function",
+        label: "fizzbuzz(3) returns \"Fizz\"",
+        labelJa: "fizzbuzz(3) が \"Fizz\" を返す",
+        callExpression: "fizzbuzz(3)",
+        expectedReturnValue: "Fizz",
+      },
+      {
+        id: "17-3",
+        type: "function",
+        label: "fizzbuzz(5) returns \"Buzz\"",
+        labelJa: "fizzbuzz(5) が \"Buzz\" を返す",
+        callExpression: "fizzbuzz(5)",
+        expectedReturnValue: "Buzz",
+      },
+      {
+        id: "17-4",
+        type: "function",
+        label: "fizzbuzz(15) returns \"FizzBuzz\"",
+        labelJa: "fizzbuzz(15) が \"FizzBuzz\" を返す",
+        callExpression: "fizzbuzz(15)",
+        expectedReturnValue: "FizzBuzz",
+      },
+      {
+        id: "17-5",
+        type: "output",
+        label: "Prints the complete FizzBuzz sequence",
+        labelJa: "FizzBuzz の全列が正しく出力される",
+        expectedOutput: "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz",
+      },
+    ],
   },
 ];
 

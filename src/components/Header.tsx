@@ -27,12 +27,6 @@ export function Header({ locale }: { locale: Locale }) {
           >
             {t(locale, "lessons")}
           </Link>
-          <Link
-            href={`/${locale}/dashboard`}
-            className="nav-link px-3 py-1.5 text-sm rounded-md"
-          >
-            {t(locale, "dashboard")}
-          </Link>
         </nav>
       </div>
       <div className="flex items-center gap-2">

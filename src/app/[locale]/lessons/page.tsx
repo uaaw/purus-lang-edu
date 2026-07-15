@@ -27,8 +27,8 @@ export default async function LessonsPage({
           style={{ color: "var(--color-text-muted)" }}
         >
           {l === "ja"
-            ? "ハンズオンコーディングでPurusをステップバイステップで学びましょう。"
-            : "Learn Purus step by step through hands-on coding exercises."}
+            ? "ハンズオン形式でPurus Langマスターになろう！"
+            : "Become a Purus Lang master through hands-on practice!"}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

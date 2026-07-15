@@ -1,117 +1,93 @@
 import { NextRequest, NextResponse } from "next/server";
-import vm from "vm";
-import { compile } from "purus";
+import { getLessonById } from "@/lib/lessons";
+import {
+  compilePurus,
+  executeCompiled,
+  gradeCompiledLesson,
+} from "@/lib/grading";
 
-const TIMEOUT_MS = 5000;
+const MAX_CODE_LENGTH = 50000;
+const ACTIONS = new Set(["compile", "run", "run-and-test"]);
+const GRADING_KEYS = new Set(["code", "action", "lessonId"]);
+
+type RunAction = "compile" | "run" | "run-and-test";
 
 interface RunRequest {
   code: string;
-  action: "compile" | "run";
+  action: RunAction;
+  lessonId?: string;
 }
 
 export async function POST(request: NextRequest) {
+  let body: unknown;
   try {
-    const body: RunRequest = await request.json();
-    const { code, action } = body;
-
-    if (!code || typeof code !== "string") {
-      return NextResponse.json(
-        { error: "Code is required" },
-        { status: 400 }
-      );
-    }
-
-    if (code.length > 50000) {
-      return NextResponse.json(
-        { error: "Code too large (max 50000 characters)" },
-        { status: 400 }
-      );
-    }
-
-    let compiled: string;
-    try {
-      compiled = compile(code, { header: false, strict: false, type: "module" });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      return NextResponse.json(
-        { error: `Compilation error: ${message}` },
-        { status: 400 }
-      );
-    }
-
-    if (action === "compile") {
-      return NextResponse.json({ compiled });
-    }
-
-    const stdout: string[] = [];
-    const stderr: string[] = [];
-
-    const sandbox = {
-      console: {
-        log: (...args: unknown[]) => stdout.push(args.map(formatValue).join(" ")),
-        info: (...args: unknown[]) => stdout.push(args.map(formatValue).join(" ")),
-        error: (...args: unknown[]) => stderr.push(args.map(formatValue).join(" ")),
-        warn: (...args: unknown[]) => stderr.push(args.map(formatValue).join(" ")),
-      },
-      Math,
-      JSON,
-      Date,
-      parseInt,
-      parseFloat,
-      String,
-      Number,
-      Boolean,
-      Array,
-      Object,
-      Error,
-      TypeError,
-      RangeError,
-      Promise,
-      setTimeout: (fn: () => void, ms: number) =>
-        globalThis.setTimeout(() => {
-          try {
-            fn();
-          } catch (asyncErr: unknown) {
-            const msg = asyncErr instanceof Error ? asyncErr.message : String(asyncErr);
-            stderr.push(msg);
-          }
-        }, Math.min(ms, 2000)),
-      process: {
-        env: {},
-        stdout: { write: (s: string) => stdout.push(s) },
-        stderr: { write: (s: string) => stderr.push(s) },
-      },
-    };
-
-    const context = vm.createContext(sandbox);
-
-    try {
-      const script = new vm.Script(compiled, { filename: "purus-run.js" });
-      script.runInContext(context, { timeout: TIMEOUT_MS });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      stderr.push(message);
-    }
-
-    return NextResponse.json({ compiled, stdout, stderr });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(
-      { error: `Server error: ${message}` },
-      { status: 500 }
-    );
+    body = await request.json();
+  } catch {
+    return badRequest("Invalid JSON body");
   }
+
+  const validationError = validateRequest(body);
+  if (validationError) {
+    return badRequest(validationError);
+  }
+
+  const { code, action, lessonId } = body as RunRequest;
+  let compiled: string;
+  try {
+    compiled = compilePurus(code);
+  } catch (error: unknown) {
+    return badRequest(`Compilation error: ${errorMessage(error)}`);
+  }
+
+  if (action === "compile") {
+    return NextResponse.json({ compiled });
+  }
+
+  if (action === "run") {
+    return NextResponse.json({ compiled, ...executeCompiled(compiled) });
+  }
+
+  const lesson = getLessonById(lessonId as string);
+  if (!lesson) {
+    return badRequest("Unknown lesson");
+  }
+
+  const result = await gradeCompiledLesson(compiled, lesson.tests);
+  return NextResponse.json({ compiled, ...result });
 }
 
-function formatValue(v: unknown): string {
-  if (v === null) return "null";
-  if (v === undefined) return "undefined";
-  if (typeof v === "object") {
-    try {
-      return JSON.stringify(v, null, 2);
-    } catch {
-      return String(v);
+function validateRequest(body: unknown): string | undefined {
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return "Invalid request body";
+  }
+
+  const value = body as Record<string, unknown>;
+  if (typeof value.code !== "string" || value.code.length === 0) {
+    return "Code is required";
+  }
+  if (value.code.length > MAX_CODE_LENGTH) {
+    return `Code too large (max ${MAX_CODE_LENGTH} characters)`;
+  }
+  if (typeof value.action !== "string" || !ACTIONS.has(value.action)) {
+    return "Invalid action";
+  }
+
+  if (value.action === "run-and-test") {
+    if (typeof value.lessonId !== "string" || value.lessonId.length === 0) {
+      return "Lesson ID is required";
+    }
+    if (Object.keys(value).some((key) => !GRADING_KEYS.has(key))) {
+      return "Invalid grading request";
     }
   }
-  return String(v);
+
+  return undefined;
+}
+
+function badRequest(error: string) {
+  return NextResponse.json({ error }, { status: 400 });
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import MonacoEditor, { type OnMount, type BeforeMount } from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { registerPurusLanguage } from "@/lib/purus-lang";
@@ -24,6 +24,11 @@ export default function Editor({
 }: EditorProps) {
   const monacoRef = useRef<typeof Monaco | null>(null);
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const onRunRef = useRef(onRun);
+
+  useEffect(() => {
+    onRunRef.current = onRun;
+  }, [onRun]);
 
   const handleBeforeMount: BeforeMount = useCallback(
     (monaco) => {
@@ -39,16 +44,14 @@ export default function Editor({
       editorRef.current = editor;
       monacoRef.current = monaco;
 
-      if (onRun) {
-        editor.addCommand(
-          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-          () => onRun(),
-        );
-      }
+      editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+        () => onRunRef.current?.(),
+      );
 
       editor.focus();
     },
-    [onRun],
+    [],
   );
 
   const handleChange = useCallback(

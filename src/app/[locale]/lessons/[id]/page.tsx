@@ -1,10 +1,11 @@
 "use client";
 
-import { use, useState, useCallback, useEffect, useRef } from "react";
+import { use, useState, useCallback, useRef, type MouseEvent } from "react";
 import { notFound } from "next/navigation";
-import { getLessonById } from "@/lib/lessons";
-import { executePurus } from "@/lib/purus";
+import { getLessonById, type Lesson } from "@/lib/lessons";
+import { executePurus, executeAndTest, type TestResult } from "@/lib/purus";
 import { t, type Locale } from "@/lib/i18n";
+import { createLessonShareUrl } from "@/lib/share";
 import Editor from "@/components/Editor";
 import { OutputPane } from "@/components/OutputPane";
 
@@ -105,61 +106,95 @@ export default function LessonPage({
   const l = locale as Locale;
   const lesson = getLessonById(id);
 
-  const [code, setCode] = useState(() => (locale === "en" ? lesson?.starterCodeEn : lesson?.starterCode) ?? "");
+  if (!lesson) {
+    notFound();
+  }
+
+  return <LessonWorkspace key={`${lesson.id}:${l}`} lesson={lesson} l={l} />;
+}
+
+function LessonWorkspace({ lesson, l }: { lesson: Lesson; l: Locale }) {
+  const [code, setCode] = useState(() => l === "ja" ? lesson.starterCode : lesson.starterCodeEn);
   const [stdout, setStdout] = useState<string[]>([]);
   const [stderr, setStderr] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const [testResults, setTestResults] = useState<TestResult[] | undefined>(undefined);
+  const [allPassed, setAllPassed] = useState<boolean | undefined>(undefined);
   const descRef = useRef<HTMLDivElement>(null);
+  const requestIdRef = useRef(0);
 
-  /* Reset code when lesson or locale changes */
-  useEffect(() => {
-    if (!lesson) return;
-    setCode(l === "ja" ? lesson.starterCode : lesson.starterCodeEn);
-    setStdout([]);
-    setStderr([]);
+  const invalidateResult = useCallback(() => {
+    requestIdRef.current += 1;
+    setIsLoading(false);
     setHasRun(false);
-    setShowSolution(false);
-  }, [lesson?.id, l]);
-
-  if (!lesson) {
-    notFound();
-  }
+    setTestResults(undefined);
+    setAllPassed(undefined);
+  }, []);
 
   const handleRun = useCallback(async () => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
     setIsLoading(true);
     setStdout([]);
     setStderr([]);
+    setTestResults(undefined);
+    setAllPassed(undefined);
     try {
-      const result = await executePurus(code);
-      setStdout(result.stdout);
-      setStderr(result.stderr);
+      if (lesson.tests.length > 0) {
+        const result = await executeAndTest(code, lesson.id);
+        if (requestId !== requestIdRef.current) return;
+        setStdout(result.stdout);
+        setStderr(result.stderr);
+        setTestResults(result.testResults);
+        setAllPassed(result.allPassed);
+      } else {
+        const result = await executePurus(code);
+        if (requestId !== requestIdRef.current) return;
+        setStdout(result.stdout);
+        setStderr(result.stderr);
+      }
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setStderr([
         err instanceof Error ? err.message : "Execution failed",
       ]);
     } finally {
-      setIsLoading(false);
-      setHasRun(true);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+        setHasRun(true);
+      }
     }
-  }, [code]);
+  }, [code, lesson]);
 
   const handleReset = useCallback(() => {
+    invalidateResult();
     setCode(l === "ja" ? lesson.starterCode : lesson.starterCodeEn);
     setStdout([]);
     setStderr([]);
-    setHasRun(false);
-  }, [lesson, l]);
+  }, [invalidateResult, lesson, l]);
 
   const handleToggleSolution = useCallback(() => {
+    invalidateResult();
+    setStdout([]);
+    setStderr([]);
     if (!showSolution) {
       setCode(lesson.solution);
     } else {
       setCode(l === "ja" ? lesson.starterCode : lesson.starterCodeEn);
     }
     setShowSolution((prev) => !prev);
-  }, [showSolution, lesson, l]);
+  }, [invalidateResult, showSolution, lesson, l]);
+
+  const handleCodeChange = useCallback((value: string) => {
+    invalidateResult();
+    setCode(value);
+  }, [invalidateResult]);
+
+  const handleShare = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    event.currentTarget.href = createLessonShareUrl(l, lesson, window.location.href);
+  }, [l, lesson]);
 
   const description = l === "ja" ? lesson.description : lesson.descriptionEn;
 
@@ -239,7 +274,7 @@ export default function LessonPage({
         <div className="flex-1 min-h-[250px]">
           <Editor
             value={code}
-            onChange={setCode}
+            onChange={handleCodeChange}
             onRun={handleRun}
             height="100%"
           />
@@ -247,8 +282,32 @@ export default function LessonPage({
       </div>
 
       {/* Right panel: output */}
-      <div className="lg:w-[400px] xl:w-[480px] border-t lg:border-t-0 shrink-0 h-[40vh] lg:h-full" style={{ borderColor: "var(--color-border)" }}>
-        <OutputPane stdout={stdout} stderr={stderr} isLoading={isLoading} locale={l} hasRun={hasRun} />
+      <div className="lg:w-[400px] xl:w-[480px] border-t lg:border-t-0 shrink-0 h-[40vh] lg:h-full flex flex-col" style={{ borderColor: "var(--color-border)" }}>
+        {allPassed === true && (
+          <div
+            className="flex items-center justify-between gap-3 px-4 py-2 text-sm font-medium shrink-0"
+            style={{
+              background: "rgba(34,197,94,0.1)",
+              color: "#22c55e",
+              borderBottom: "1px solid rgba(34,197,94,0.2)",
+            }}
+          >
+            <span>{t(l, "lessonCompleted")}</span>
+            <a
+              href="https://twitter.com/intent/tweet"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleShare}
+              className="rounded px-3 py-1 text-xs font-semibold"
+              style={{ backgroundColor: "#111", color: "#fff" }}
+            >
+              {t(l, "shareOnX")}
+            </a>
+          </div>
+        )}
+        <div className="flex-1 min-h-0">
+          <OutputPane stdout={stdout} stderr={stderr} isLoading={isLoading} locale={l} hasRun={hasRun} testResults={testResults} allPassed={allPassed} />
+        </div>
       </div>
     </div>
   );

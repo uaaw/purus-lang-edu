@@ -11,8 +11,8 @@ Purusプログラミング言語を学ぶためのインタラクティブWebア
 - サーバーサイドコード実行
 - ダーク/ライトテーマ切り替え
 - 日本語/英語バイリンガル対応
-- GitHub OAuth認証
-- PostgreSQLによるユーザー進捗管理
+- 実行結果に基づくレッスンの自動採点
+- Xへのレッスン修了共有
 
 ## 技術スタック
 
@@ -22,9 +22,6 @@ Purusプログラミング言語を学ぶためのインタラクティブWebア
 | 言語 | TypeScript |
 | UI | Tailwind CSS v4 |
 | コードエディタ | Monaco Editor |
-| 認証 | NextAuth.js (GitHub OAuth) |
-| ORM | Prisma |
-| データベース | PostgreSQL |
 | 実行環境 | purus (npm) |
 
 ## 始め方
@@ -32,8 +29,6 @@ Purusプログラミング言語を学ぶためのインタラクティブWebア
 ### 前提条件
 
 - Node.js 18以上
-- PostgreSQL
-- GitHub OAuth App (認証機能を使用する場合)
 
 ### インストール
 
@@ -41,25 +36,6 @@ Purusプログラミング言語を学ぶためのインタラクティブWebア
 git clone <repository-url>
 cd purus-lang-edu
 npm install
-```
-
-### 環境設定
-
-`.env.local`ファイルを作成し、以下の変数を設定してください。
-
-```
-DATABASE_URL=postgresql://user:password@localhost:5432/purus_edu
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-NEXTAUTH_SECRET=your_random_secret
-NEXTAUTH_URL=http://localhost:3000
-```
-
-### データベース初期セットアップ
-
-```bash
-npx prisma migrate dev
-npx prisma generate
 ```
 
 ### 起動
@@ -74,13 +50,10 @@ npm run dev
 
 ```
 purus-lang-edu/
-├── prisma/
-│   └── schema.prisma          /* DBスキーマ定義 */
 ├── public/                     /* 静的アセット */
 ├── src/
 │   ├── app/
 │   │   ├── [locale]/           /* ロケール対応ルート */
-│   │   │   ├── dashboard/      /* ダッシュボードページ */
 │   │   │   ├── lessons/        /* レッスン一覧・詳細ページ */
 │   │   │   │   └── [id]/
 │   │   │   │       └── not-found.tsx /* レッスン404ページ */
@@ -88,8 +61,6 @@ purus-lang-edu/
 │   │   │   ├── not-found.tsx   /* ロケール404ページ */
 │   │   │   └── page.tsx        /* トップページ */
 │   │   ├── api/
-│   │   │   ├── auth/           /* NextAuth認証API */
-│   │   │   ├── progress/       /* 進捗管理API */
 │   │   │   └── run/            /* コード実行API */
 │   │   ├── globals.css
 │   │   └── layout.tsx          /* ルートレイアウト */
@@ -103,15 +74,11 @@ purus-lang-edu/
 │   ├── hooks/
 │   │   └── useTheme.ts         /* テーマ管理フック */
 │   ├── lib/
-│   │   ├── auth.ts             /* NextAuth設定 */
 │   │   ├── i18n.ts             /* 国際化設定 */
 │   │   ├── lessons.ts          /* レッスンデータ */
-│   │   ├── prisma.ts           /* Prismaクライアント */
 │   │   ├── purus-lang.ts       /* Purus言語定義 */
 │   │   └── purus.ts            /* Purus実行ラッパー */
-│   ├── proxy.ts                 /* プロキシ設定 */
-│   └── types/
-│       └── next-auth.d.ts      /* NextAuth型定義 */
+│   └── proxy.ts                 /* プロキシ設定 */
 ├── package.json
 ├── tsconfig.json
 └── next.config.ts
